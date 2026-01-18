@@ -1,0 +1,29 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - run: cd backend && npm ci && npm run lint --if-present
+      - run: cd web-client && npm ci && npm run build
+      - run: cd backend && nohup npm start > /tmp/backend.log 2>&1 & sleep 2
+      - run: cd tests/integration && node drift-test.js

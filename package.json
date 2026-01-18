@@ -1,0 +1,30 @@
+{
+  "name": "duo-sync-poc",
+  "version": "0.2.0",
+  "description": "PoC for Spotify Duo Synchronized Listening",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "web-client"
+  ],
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install && cd ../web-client && npm install",
+    "start": "concurrently \"npm --prefix backend start\" \"npm --prefix web-client start\"",
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix web-client run dev\"",
+    "test": "npm --prefix backend test && npm --prefix web-client test",
+    "lint": "eslint . --ext .js,.jsx",
+    "format": "prettier --write \"**/*.{js,jsx,json,md}\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "spotify",
+    "duo",
+    "synchronized-listening",
+    "websocket",
+    "poc"
+  ],
+  "author": "Panagiotis Katopodis; MS Copilot; Claude (Anthropic); Grok (xAI)",
+  "license": "MIT"
+}

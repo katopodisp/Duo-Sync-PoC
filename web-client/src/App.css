@@ -1,0 +1,12 @@
+/* (keep the CSS from original) */
+:root {
+  --primary: #667eea;
+  --secondary: #764ba2;
+  --success: #1db954;
+  --error: #d32f2f;
+  --gray-light: #f5f5f5;
+  --gray-medium: #999;
+  --gray-dark: #333;
+}
+
+/* ... rest of CSS ... */

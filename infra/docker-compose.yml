@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: duo_sync_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: duo_sync_backend
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
+      - NODE_ENV=development
+      - LOG_LEVEL=info
+      - API_KEY=your-secret-key
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
+
+  web-client:
+    build:
+      context: ../web-client
+      dockerfile: Dockerfile
+    container_name: duo_sync_web_client
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_SPOTIFY_CLIENT_ID=${VITE_SPOTIFY_CLIENT_ID}
+      - VITE_REDIRECT_URI=http://localhost:5173/callback
+      - VITE_SYNC_SERVER_WS=ws://localhost:3000
+      - VITE_APP_BASE_URL=http://localhost:5173
+      - VITE_API_KEY=your-secret-key
+    depends_on:
+      - backend
+    restart: unless-stopped
+    volumes:
+      - ../web-client:/app
+      - /app/node_modules
+
+volumes:
+  redis_data:
